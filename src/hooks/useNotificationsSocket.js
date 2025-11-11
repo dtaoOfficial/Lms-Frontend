@@ -6,8 +6,8 @@ import SockJS from "sockjs-client";
  * ✅ WebSocket Hook for Live Notifications
  * Automatically uses .env settings and adapts to HTTPS (wss://)
  * Example .env:
- *   REACT_APP_SOCKET_URL=wss://api.yourdomain.com/ws
- *   REACT_APP_API_URL=https://api.yourdomain.com
+ *   REACT_APP_SOCKET_URL=https://lms-vnu1.onrender.com/ws
+ *   REACT_APP_API_URL=https://lms-vnu1.onrender.com
  */
 export default function useNotificationsSocket(onNewNotification) {
   useEffect(() => {
@@ -18,8 +18,8 @@ export default function useNotificationsSocket(onNewNotification) {
 
     console.log("[Socket] Connecting to:", baseSocketUrl);
 
-    // 2️⃣ Initialize SockJS client
-    const socket = new SockJS(baseSocketUrl);
+    // ✅ Fix: SockJS expects http(s) scheme, not ws(s)
+    const socket = new SockJS(baseSocketUrl.replace(/^ws/, "http"));
 
     // 3️⃣ Configure STOMP client
     const client = new Client({
@@ -44,10 +44,8 @@ export default function useNotificationsSocket(onNewNotification) {
       },
     });
 
-    // 4️⃣ Activate the client
     client.activate();
 
-    // 5️⃣ Cleanup on unmount
     return () => {
       try {
         if (client.connected) {
