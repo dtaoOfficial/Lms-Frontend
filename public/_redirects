@@ -1,0 +1,7 @@
+# Redirect www → non-www
+https://www.yourdomain.com/*  https://yourdomain.com/:splat  301!
+
+# SPA fallback (for React Router)
+# This ensures direct URL refresh works (e.g. /dashboard or /profile)
+# It tells Netlify to serve index.html for all routes
+/* /index.html  200

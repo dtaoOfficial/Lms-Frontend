@@ -1,3 +1,32 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
 Disallow:
+
+
+
+# ============================================
+# 🤖 robots.txt for LMS Platform
+# Controls what web crawlers can access
+# ============================================
+
+# Allow all search engines full access
+User-agent: *
+Allow: /
+
+# Disallow private or restricted pages (optional)
+Disallow: /admin/
+Disallow: /teacher/
+Disallow: /profile/
+Disallow: /settings/
+
+# 📍 Point search engines to your sitemap
+Sitemap: https://yourdomain.com/sitemap.xml
+
+# ============================================
+# 🧠 Notes
+# ============================================
+# Replace 'yourdomain.com' with your actual production domain.
+# This file helps Google, Bing, and others find your sitemap easily.
+# 'Disallow' tells crawlers not to index sensitive areas.
+# Keep this in the public folder so it's available at:
+# https://yourdomain.com/robots.txt

@@ -1,4 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 1. Define color variables for Light Mode (default) */
+:root {
+  --color-bg-primary: 255 255 255; /* white */
+  --color-bg-secondary: 243 244 246; /* gray-100 */
+  --color-text-primary: 17 24 39; /* gray-900 */
+  --color-text-secondary: 75 85 99; /* gray-500 */
+  
+  /* Default accent */
+  --color-accent: 59 130 246; /* blue-500 */
+}
+
+/* 2. Define color variables for Dark Mode */
+.dark {
+  --color-bg-primary: 17 24 39; /* gray-900 */
+  --color-bg-secondary: 31 41 55; /* gray-800 */
+  --color-text-primary: 243 244 246; /* gray-100 */
+  --color-text-secondary: 156 163 175; /* gray-400 */
+}
+
+/* 3. Define Accent Theme classes */
+.theme-blue {
+  --color-accent: 59 130 246; /* blue-500 */
+}
+.theme-purple {
+  --color-accent: 168 85 247; /* purple-500 */
+}
+.theme-emerald {
+  --color-accent: 16 185 129; /* emerald-500 */
+}
+.theme-rose {
+  --color-accent: 244 63 94; /* rose-500 */
+}
+.theme-amber {
+  --color-accent: 245 158 11; /* amber-500 */
+}
+
+
+/* 4. Apply base styles to the body */
 body {
+  @apply bg-background text-text-primary transition-colors duration-200;
+  
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
