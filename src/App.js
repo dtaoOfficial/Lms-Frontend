@@ -7,9 +7,13 @@ import { HelmetProvider } from "react-helmet-async";
 // --- NEW IMPORTS ---
 import { ThemeProvider } from "./context/ThemeContext";
 import Footer from "./components/Footer";
+import useHealthPing from "./hooks/useHealthPing"; // 🧠 Auto-ping backend
 // -------------------
 
 export default function App() {
+  // 🔁 Ping backend every 2 seconds to prevent Render from sleeping
+  useHealthPing();
+
   return (
     <HelmetProvider>
       <Router>
