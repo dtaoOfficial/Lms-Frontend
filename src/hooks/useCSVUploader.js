@@ -1,51 +1,59 @@
 // src/hooks/useCSVUploader.js
 import { useState } from "react";
+import Papa from "papaparse";
 
 /**
- * useCSVUploader
- * ----------------
- * A custom React hook for parsing and validating CSV files on the client.
- * Used in Admin Exam CSV Upload flow.
- *
- * Expected Headers:
- *   Question, OptionA, OptionB, OptionC, OptionD, Answer, Explanation
+ * ✅ useCSVUploader (Final Synced Version)
+ * Works perfectly with backend CSVParserUtil.java
+ * Supports:
+ *  - Custom delimiter (¬)
+ *  - Custom quoteChar (using £)
+ *  - C code syntax like printf("%d", a>10 || b<20)
+ *  - Validates headers
+ *  - Clean preview data for upload
  */
-
 export default function useCSVUploader() {
   const [previewData, setPreviewData] = useState([]);
   const [error, setError] = useState("");
   const [fileName, setFileName] = useState("");
 
-  /**
-   * Parse the uploaded CSV file into structured objects
-   * @param {File} file - CSV file from input
-   */
   const parseCSV = async (file) => {
     if (!file) {
       setError("Please select a valid CSV file.");
       return;
     }
 
-    if (!file.name.endsWith(".csv")) {
-      setError("Only CSV files are allowed.");
+    if (!file.name.toLowerCase().endsWith(".csv")) {
+      setError("Only CSV files are allowed (.csv).");
       return;
     }
 
     try {
       const text = await file.text();
-      const rows = text
-        .split(/\r?\n/)
-        .map((r) => r.trim())
-        .filter((r) => r.length > 0)
-        .map((r) => r.split(","));
 
-      if (rows.length === 0) {
-        setError("The CSV file is empty.");
+      // ✅ Proper CSV parsing using PapaParse
+      const { data, errors, meta } = Papa.parse(text, {
+        header: true,
+        skipEmptyLines: true,
+        quoteChar: "£",        // 👈 custom quote char (matches backend)
+        escapeChar: "",        // 👈 disable escape parsing
+        delimiter: "¬",        // 👈 custom delimiter
+        newline: "",           // auto-detect line endings
+        transformHeader: (h) =>
+          h.replace(/\s+/g, "").trim().toLowerCase(), // normalize headers
+        dynamicTyping: false,
+      });
+
+      if (errors?.length > 0) {
+        console.warn("⚠️ CSV parse warnings:", errors);
+      }
+
+      if (!data || data.length === 0) {
+        setError("No valid data found in CSV file.");
         setPreviewData([]);
         return;
       }
 
-      const headers = rows[0].map((h) => h.trim().toLowerCase());
       const expectedHeaders = [
         "question",
         "optiona",
@@ -56,52 +64,50 @@ export default function useCSVUploader() {
         "explanation",
       ];
 
-      const validHeaders = expectedHeaders.every((h) => headers.includes(h));
+      const fileHeaders = meta.fields?.map((h) => h.toLowerCase()) || [];
+      const validHeaders = expectedHeaders.every((h) =>
+        fileHeaders.includes(h)
+      );
+
       if (!validHeaders) {
         setError(
-          `Invalid CSV headers. Expected: ${expectedHeaders.join(", ")}`
+          `Invalid CSV headers. Expected: ${expectedHeaders.join("¬")}`
         );
         setPreviewData([]);
         return;
       }
 
-      // Find index of each column (flexible header positions)
-      const headerMap = {};
-      headers.forEach((h, i) => {
-        headerMap[h] = i;
-      });
+      // ✅ Clean and normalize question data
+      const cleanData = data
+        .map((row) => ({
+          question: (row.question || "").trim(),
+          optionA: (row.optiona || "").trim(),
+          optionB: (row.optionb || "").trim(),
+          optionC: (row.optionc || "").trim(),
+          optionD: (row.optiond || "").trim(),
+          answer: (row.answer || "").trim(),
+          explanation: (row.explanation || "").trim(),
+        }))
+        .filter((q) => q.question.length > 0);
 
-      // Build parsed question list
-      const parsed = rows.slice(1).map((cols) => ({
-        question: cols[headerMap["question"]] || "",
-        optionA: cols[headerMap["optiona"]] || "",
-        optionB: cols[headerMap["optionb"]] || "",
-        optionC: cols[headerMap["optionc"]] || "",
-        optionD: cols[headerMap["optiond"]] || "",
-        answer: cols[headerMap["answer"]] || "",
-        explanation: cols[headerMap["explanation"]] || "",
-      }));
-
-      // Filter out empty questions
-      const clean = parsed.filter((q) => q.question.trim().length > 0);
-
-      if (clean.length === 0) {
-        setError("No valid questions found in CSV.");
+      if (cleanData.length === 0) {
+        setError("No valid questions found in the CSV file.");
         setPreviewData([]);
         return;
       }
 
-      setPreviewData(clean);
+      setPreviewData(cleanData);
       setError("");
       setFileName(file.name);
     } catch (err) {
-      console.error("CSV parsing failed:", err);
-      setError("Failed to read CSV file. Check file encoding or format.");
+      console.error("💥 CSV parsing failed:", err);
+      setError(
+        "Failed to parse CSV file. Please ensure it's UTF-8 encoded and formatted correctly."
+      );
       setPreviewData([]);
     }
   };
 
-  /** Reset hook data */
   const resetCSV = () => {
     setPreviewData([]);
     setError("");

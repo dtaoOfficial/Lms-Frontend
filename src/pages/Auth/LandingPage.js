@@ -1,10 +1,10 @@
-import React, { useRef, useState } from "react";
+// src/pages/Auth/LandingPage.js
+import React, { useRef, useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, useMotionValue, useTransform, useSpring, AnimatePresence } from "framer-motion";
 import { Typewriter } from "react-simple-typewriter";
 import ThemeToggle from "../../components/ThemeToggle";
-// --- FIX: Correct icon names ---
-import { BookOpen, Zap, Users, BarChart, Sun, Moon } from "lucide-react"; 
+import { BookOpen, Zap, Users, BarChart, Sun, Moon } from "lucide-react";
 import ScrollAnimation from "../../components/ScrollAnimation";
 import { useTheme } from "../../context/ThemeContext";
 
@@ -12,19 +12,23 @@ import { useTheme } from "../../context/ThemeContext";
 import courseImage1 from '../../assets/course_images/gradient-1.png';
 import courseImage2 from '../../assets/course_images/gradient-2.png';
 import courseImage3 from '../../assets/course_images/gradient-3.png';
-import courseImage4 from '../../assets/course_images/gradient-4.png';
-import courseImage5 from '../../assets/course_images/gradient-5.png';
-import courseImage6 from '../../assets/course_images/gradient-6.png';
+
 // ------------------------------
+
+// --- College Hero Slider Images ---
+const collegeImages = [
+  "https://res.cloudinary.com/duhki4wze/image/upload/v1762918121/WhatsApp_Image_2025-11-12_at_08.55.04_40e7c2c9_a25oub.jpg",
+  "https://res.cloudinary.com/duhki4wze/image/upload/v1762918122/WhatsApp_Image_2025-11-12_at_08.54.53_c0451f1e_sog7f6.jpg",
+  "https://res.cloudinary.com/duhki4wze/image/upload/v1762918121/WhatsApp_Image_2025-11-12_at_08.55.04_40e7c2c9_a25oub.jpg",
+  "https://res.cloudinary.com/duhki4wze/image/upload/v1762918120/WhatsApp_Image_2025-11-12_at_08.54.56_187ebecd_drf9gg.jpg"
+];
 
 // --- Mock Data for Courses (Unchanged) ---
 const courses = [
-  { title: "React Deep Dive", img: courseImage1 },
-  { title: "Node.js Masterclass", img: courseImage2 },
-  { title: "Tailwind CSS from Scratch", img: courseImage3 },
-  { title: "JavaScript Algorithms", img: courseImage4 },
-  { title: "DevOps Fundamentals", img: courseImage5 },
-  { title: "AI for Developers", img: courseImage6 },
+  { title: "B.Sc – Computer Science", img: courseImage1 },
+  { title: "B.Com – Computer Applications", img: courseImage2 },
+  { title: "B.Sc – Food Science & Technology", img: courseImage3 }
+  
 ];
 
 // --- Page Animation Variants ---
@@ -76,88 +80,138 @@ function LandingPage() {
   );
 }
 
-// --- 1. Header Component (Unchanged) ---
+/* ============================
+   Header with College Info
+   ============================ */
 const Header = () => (
-  <motion.nav 
-    variants={itemVariants}
-    className="absolute top-0 left-0 right-0 z-50"
-  >
-    <div className="flex h-20 items-center justify-between max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="flex-shrink-0">
-        <Link to="/" className="text-2xl font-extrabold text-accent">
-          DTAO
-        </Link>
-      </div>
-      <div className="flex items-center gap-2 sm:gap-4">
-        {/* --- FIX: Show full toggle on desktop, simple toggle on mobile --- */}
-        <div className="hidden sm:block">
-          <ThemeToggle />
-        </div>
-        <div className="sm:hidden">
-          <MobileThemeToggle />
-        </div>
-        {/* ----------------------------------------------------------------- */}
-
-        <Link
-          to="/login"
-          className="px-3 py-1.5 text-sm font-medium text-text-primary rounded-md hover:bg-white/10 transition-colors"
-        >
-          Login
-        </Link>
-        <Link
-          to="/register"
-          className="px-3 py-1.5 bg-accent text-white rounded-md text-sm font-medium hover:bg-accent/90 transition-opacity"
-        >
-          Register
-        </Link>
-      </div>
+  <>
+    {/* Top Red Bar */}
+    <div className="bg-red-600 text-white text-sm py-2 px-4 flex justify-between items-center">
+      <div>📞 9490006663</div>
+      <div>📧 directorvrrcollege@gmail.com</div>
     </div>
-  </motion.nav>
+
+    {/* Main Header */}
+    <motion.nav variants={itemVariants} className="bg-white shadow-md relative z-50">
+      <div className="flex justify-between items-center max-w-7xl mx-auto py-3 px-6">
+        <div className="flex items-center gap-3">
+          <img
+            src="https://res.cloudinary.com/duhki4wze/image/upload/v1740047548/j7ustpcoxthwres98ftt.png"
+            alt="VRR Logo"
+            className="w-12 h-12"
+          />
+          <div>
+            <h1 className="text-lg sm:text-2xl font-bold text-accent">VRR Degree College</h1>
+            <p className="text-xs text-gray-600">Kallur, Andhra Pradesh</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <Link
+            to="/login"
+            className="text-accent font-medium hover:underline"
+          >
+            Login
+          </Link>
+          <Link
+            to="/register"
+            className="bg-accent text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-accent/90 transition"
+          >
+            Register
+          </Link>
+        </div>
+      </div>
+    </motion.nav>
+  </>
 );
 
-// --- 2. Hero Section (Unchanged) ---
-const HeroSection = ({ navigate }) => (
-  <motion.section 
-    className="relative flex flex-col items-center justify-center min-h-[80vh] text-center px-4 overflow-hidden pt-24"
-  >
-    {/* Animated Grid Pattern Background */}
-    <GridPattern />
+/* ============================
+   Hero Section with Auto Slider
+   ============================ */
+const HeroSection = ({ navigate }) => {
+  const [index, setIndex] = useState(0);
 
-    {/* Hero Content */}
-    <div className="relative z-10 flex flex-col items-center">
-      <h1 className="text-4xl font-bold tracking-tight text-text-primary sm:text-6xl lg:text-7xl">
-        <Typewriter
-          words={["Welcome to DTAO Learning"]}
-          loop={1}
-          cursor
-          cursorStyle="_"
-          typeSpeed={70}
-          deleteSpeed={50}
-          delaySpeed={1000}
+  // Auto-slide every 4s
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex((prev) => (prev + 1) % collegeImages.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <section className="relative w-full h-[80vh] overflow-hidden flex flex-col justify-center items-center text-center">
+      {/* Slider Images */}
+      {collegeImages.map((img, i) => (
+        <motion.img
+          key={i}
+          src={img}
+          alt={`College Slide ${i + 1}`}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: i === index ? 1 : 0 }}
+          transition={{ duration: 1 }}
+          className="absolute inset-0 w-full h-full object-cover"
         />
-      </h1>
-      <p className="mt-6 text-lg leading-8 text-text-secondary max-w-2xl mx-auto">
-        Unlock your potential with our expert-led courses. From coding to design,
-        your journey to mastery starts here.
-      </p>
-      <div className="mt-10">
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => navigate("/login")}
-          className="rounded-md bg-accent px-5 py-3 text-base font-semibold text-white shadow-lg hover:bg-accent/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-        >
-          Get Started
-        </motion.button>
-      </div>
-    </div>
-  </motion.section>
-);
+      ))}
 
-// --- 3. Course Section (Unchanged) ---
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-black/40"></div>
+
+      {/* Content */}
+      <div className="relative z-10 text-white px-4">
+        <img
+          src="https://res.cloudinary.com/duhki4wze/image/upload/v1740047548/j7ustpcoxthwres98ftt.png"
+          alt="VRR College Logo"
+          className="mx-auto w-24 h-24 mb-4 rounded-full bg-white/80 p-2"
+        />
+        <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold">VRR Degree College</h1>
+        <p className="mt-2 text-base sm:text-lg">Kallur, 517113, Andhra Pradesh</p>
+        <p className="mt-1 text-sm opacity-90">📞 9490006663</p>
+        <p className="mt-1 text-sm opacity-90">🎓 Affiliated Programs</p>
+
+        <ul className="mt-3 space-y-1 text-sm sm:text-base">
+          <li>B.Sc – Computer Science</li>
+          <li>B.Com – Computer Applications</li>
+          <li>B.Sc – Food Science & Technology</li>
+        </ul>
+
+        <div className="mt-6 flex flex-col sm:flex-row justify-center gap-3">
+          <button
+            onClick={() => navigate("/login")}
+            className="bg-accent text-white px-5 py-2 rounded-lg shadow hover:bg-accent/90 transition"
+          >
+            Login
+          </button>
+          <button
+            onClick={() => navigate("/register")}
+            className="bg-white text-accent px-5 py-2 rounded-lg shadow hover:bg-gray-100 transition"
+          >
+            Register
+          </button>
+        </div>
+      </div>
+
+      {/* Manual Navigation Buttons */}
+      <div className="absolute bottom-6 flex gap-3">
+        {collegeImages.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setIndex(i)}
+            aria-label={`Slide ${i + 1}`}
+            className={`w-3 h-3 rounded-full ${i === index ? "bg-white" : "bg-white/40"}`}
+          ></button>
+        ))}
+      </div>
+    </section>
+  );
+};
+
+/* ============================
+   Course Section
+   ============================ */
 const CourseSection = ({ navigate }) => (
-  <motion.section className="py-20 px-4 max-w-7xl mx-auto">
-    <h2 className="text-3xl font-bold text-center text-text-primary mb-12">
+  <motion.section className="py-12 md:py-20 px-4 max-w-7xl mx-auto">
+    <h2 className="text-3xl font-bold text-center text-text-primary mb-8">
       Explore Our Courses
     </h2>
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -168,7 +222,9 @@ const CourseSection = ({ navigate }) => (
   </motion.section>
 );
 
-// --- 3D TILT CARD with Image Fallback (Unchanged) ---
+/* ============================
+   CourseCard (3D tilt)
+   ============================ */
 const CourseCard = ({ course, navigate }) => {
   const cardRef = useRef(null);
   const [imageError, setImageError] = useState(false);
@@ -215,14 +271,12 @@ const CourseCard = ({ course, navigate }) => {
         transformStyle: "preserve-3d",
         perspective: 1000,
       }}
-      className="relative bg-secondary rounded-xl shadow-lg overflow-hidden border border-white/10
-                 transition-all duration-300 ease-out
-                 hover:shadow-xl hover:border-accent"
+      className="relative bg-secondary rounded-xl shadow-lg overflow-hidden border border-white/10 transition-all duration-300 ease-out hover:shadow-xl hover:border-accent"
     >
       <motion.div
         className="absolute inset-0 rounded-xl pointer-events-none"
         style={{
-          background: "radial-gradient(400px circle at var(--x) var(--y), rgba(var(--color-accent), 0.3), transparent 80%)",
+          background: "radial-gradient(400px circle at var(--x) var(--y), rgba(var(--color-accent), 0.08), transparent 80%)",
         }}
         animate={{
           "--x": mouseXSpring,
@@ -233,7 +287,7 @@ const CourseCard = ({ course, navigate }) => {
 
       <div className="relative" style={{ transform: "translateZ(20px)", transformStyle: "preserve-3d" }}>
         {imageError || !course.img ? (
-          <div className="h-40 w-full flex items-center justify-center p-4 text-center">
+          <div className="h-40 w-full flex items-center justify-center p-4 text-center relative">
              <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-purple-600 opacity-80" />
              <p className="relative z-10 text-white text-xl font-bold">{course.title}</p>
           </div>
@@ -259,7 +313,9 @@ const CourseCard = ({ course, navigate }) => {
   );
 };
 
-// --- 4. Features Bento Grid (Unchanged) ---
+/* ============================
+   Features Section
+   ============================ */
 const FeaturesSection = () => (
   <motion.section className="py-20 px-4 max-w-7xl mx-auto">
     <h2 className="text-3xl font-bold text-center text-text-primary mb-12">
@@ -305,24 +361,26 @@ const FeatureCard = ({ icon, title, description, className }) => (
   </motion.div>
 );
 
-// --- 5. Footer Component (FIXED) ---
+/* ============================
+   Footer
+   ============================ */
 const Footer = () => (
   <motion.footer className="bg-secondary border-t border-white/10 mt-20">
     <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 gap-8">
       <div>
-        <h3 className="text-sm font-semibold text-text-secondary uppercase tracking-wider">Company</h3>
+        <h3 className="text-sm font-semibold text-text-secondary uppercase tracking-wider">College</h3>
         <ul className="mt-4 space-y-2">
           <li><Link to="#" className="text-base text-text-primary hover:text-accent">About</Link></li>
-          <li><Link to="#" className="text-base text-text-primary hover:text-accent">Careers</Link></li>
-          <li><Link to="#" className="text-base text-text-primary hover:text-accent">Press</Link></li>
+          <li><Link to="#" className="text-base text-text-primary hover:text-accent">Admissions</Link></li>
+          <li><Link to="#" className="text-base text-text-primary hover:text-accent">Departments</Link></li>
         </ul>
       </div>
       <div>
         <h3 className="text-sm font-semibold text-text-secondary uppercase tracking-wider">Learn</h3>
         <ul className="mt-4 space-y-2">
-          <li><Link to="#" className="text-base text-text-primary hover:text-accent">Features</Link></li>
           <li><Link to="#" className="text-base text-text-primary hover:text-accent">Courses</Link></li>
-          <li><Link to="#" className="text-base text-text-primary hover:text-accent">Pricing</Link></li>
+          <li><Link to="#" className="text-base text-text-primary hover:text-accent">Events</Link></li>
+          <li><Link to="#" className="text-base text-text-primary hover:text-accent">Workshops</Link></li>
         </ul>
       </div>
       <div>
@@ -343,36 +401,15 @@ const Footer = () => (
     </div>
     <div className="border-t border-white/10 py-6 px-4 sm:px-6 lg:px-8">
       <p className="text-center text-sm text-text-secondary">
-        &copy; {new Date().getFullYear()} DTAO Official. All rights reserved.
-      </p> {/* <-- SYNTAX FIX */}
+        &copy; {new Date().getFullYear()} VRR Degree College, Kallur. All rights reserved.
+      </p>
     </div>
   </motion.footer>
 );
 
-// --- Grid Pattern Component (Unchanged) ---
-const GridPattern = () => {
-  return (
-    <motion.div
-      className="absolute inset-0 z-0 h-full w-full"
-      style={{
-        backgroundImage:
-          "radial-gradient(circle, rgba(var(--color-accent), 0.1) 1px, transparent 1.5px)",
-        backgroundSize: "30px 30px",
-      }}
-      animate={{
-        backgroundPosition: ["0% 0%", "100% 100%"],
-      }}
-      transition={{
-        duration: 30,
-        ease: "linear",
-        repeat: Infinity,
-        repeatType: "mirror",
-      }}
-    />
-  );
-};
-
-// --- NEW Mobile Theme Toggle (FIXED) ---
+/* ============================
+   Mobile Theme Toggle
+   ============================ */
 const MobileThemeToggle = () => {
   const { theme, setTheme } = useTheme();
 
@@ -395,7 +432,7 @@ const MobileThemeToggle = () => {
             exit={{ y: 20, opacity: 0, scale: 0.5, rotate: 90 }}
             transition={{ duration: 0.2 }}
           >
-            <Sun className="h-5 w-5" /> {/* <-- ICON NAME FIX */}
+            <Sun className="h-5 w-5" />
           </motion.div>
         ) : (
           <motion.div
@@ -405,13 +442,12 @@ const MobileThemeToggle = () => {
             exit={{ y: -20, opacity: 0, scale: 0.5, rotate: -90 }}
             transition={{ duration: 0.2 }}
           >
-            <Moon className="h-5 w-5" /> {/* <-- ICON NAME FIX */}
+            <Moon className="h-5 w-5" />
           </motion.div>
         )}
       </AnimatePresence>
     </button>
   );
 };
-
 
 export default LandingPage;

@@ -1,3 +1,4 @@
+// src/pages/Admin/AdminDashboard.js
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
@@ -11,14 +12,14 @@ import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import ScrollAnimation from "../../components/ScrollAnimation";
 // -------------------
 
-// --- NEW: Animation Component for Numbers ---
+// --- Animated Number ---
 function NumberAnimation({ value }) {
   const count = useMotionValue(0);
   const rounded = useTransform(count, (latest) => Math.round(latest));
 
   useEffect(() => {
     const controls = animate(count, value, {
-      duration: 1.5, // Animate over 1.5 seconds
+      duration: 1.5,
       ease: "easeOut",
     });
     return controls.stop;
@@ -27,23 +28,18 @@ function NumberAnimation({ value }) {
   return <motion.span>{rounded}</motion.span>;
 }
 
-// --- NEW: Stagger Animation for Page Sections ---
+// --- Animation Variants ---
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.1, // Each child fades in 0.1s after the last
-    },
+    transition: { staggerChildren: 0.1 },
   },
 };
-
 const itemVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0 },
 };
-// ---------------------------------------------
-
 
 function AdminDashboard() {
   const [stats, setStats] = useState({});
@@ -54,7 +50,6 @@ function AdminDashboard() {
   const [refreshing, setRefreshing] = useState(false);
   const navigate = useNavigate();
 
-  // --- ALL YOUR LOGIC (UNCHANGED) ---
   const fetchDashboard = async () => {
     setRefreshing(true);
     try {
@@ -79,12 +74,10 @@ function AdminDashboard() {
   useEffect(() => {
     fetchDashboard();
   }, []);
-  // --- END OF LOGIC ---
 
   return (
     <>
       <Helmet>
-        {/* ... (Your Helmet code is unchanged) ... */}
         <title>Admin Dashboard | LMS Platform</title>
         <meta
           name="description"
@@ -92,16 +85,10 @@ function AdminDashboard() {
         />
       </Helmet>
 
-      {/* 1. PAGE TRANSITION WRAPPER */}
-      <motion.div
-        initial="hidden" // Use "hidden" for stagger
-        animate="visible" // Use "visible" for stagger
-        exit={{ opacity: 0, y: -15 }}
-        variants={containerVariants} // <-- ADDED STAGGER
-      >
-        {/* 2. DARK MODE FIXES APPLIED */}
+      <motion.div initial="hidden" animate="visible" exit={{ opacity: 0, y: -15 }} variants={containerVariants}>
         <div className="p-6 min-h-screen bg-background">
-          <motion.div variants={itemVariants} className="flex justify-between items-center mb-6"> {/* <-- STAGGER ITEM */}
+          {/* HEADER */}
+          <motion.div variants={itemVariants} className="flex justify-between items-center mb-6">
             <div>
               <h1 className="text-3xl font-bold text-text-primary">⚙️ Admin Dashboard</h1>
               <p className="text-text-secondary">Your control center for platform insights.</p>
@@ -115,29 +102,24 @@ function AdminDashboard() {
             </button>
           </motion.div>
 
-          {/* 3. SCROLL ANIMATION + STAGGER ITEM */}
-          <motion.div variants={itemVariants}> {/* <-- STAGGER ITEM */}
+          {/* STATS OVERVIEW */}
+          <motion.div variants={itemVariants}>
             <ScrollAnimation>
               <StatsCards data={stats} loading={loading} />
             </ScrollAnimation>
           </motion.div>
 
-          {/* 3. SCROLL ANIMATION + STAGGER ITEM */}
-          <motion.div variants={itemVariants}> {/* <-- STAGGER ITEM */}
+          {/* QUICK ACTION CARDS */}
+          <motion.div variants={itemVariants}>
             <ScrollAnimation>
               <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-                
-                {/* 4. HOVER ANIMATION ADDED */}
-                <motion.div
-                  whileHover={{ scale: 1.03 }} // <-- HOVER POP
-                  className="bg-secondary border border-white/10 rounded-xl shadow-lg p-6 transition-all"
-                >
+                {/* STUDENT PROGRESS */}
+                <motion.div whileHover={{ scale: 1.03 }} className="bg-secondary border border-white/10 rounded-xl shadow-lg p-6 transition-all">
                   <h2 className="text-lg font-semibold text-text-primary mb-2">🎓 Student Progress</h2>
                   <p className="text-sm text-text-secondary mb-3">
                     Track overall student learning progress.
                   </p>
                   <p className="text-4xl font-bold text-green-600">
-                    {/* 5. NUMBER ANIMATION ADDED */}
                     <NumberAnimation value={studentProgress?.averageProgress ?? 0} />%
                   </p>
                   <button
@@ -148,11 +130,8 @@ function AdminDashboard() {
                   </button>
                 </motion.div>
 
-                {/* 4. HOVER ANIMATION ADDED */}
-                <motion.div
-                  whileHover={{ scale: 1.03 }} // <-- HOVER POP
-                  className="bg-secondary border border-white/10 rounded-xl shadow-lg p-6 transition-all"
-                >
+                {/* FORUM MODERATION */}
+                <motion.div whileHover={{ scale: 1.03 }} className="bg-secondary border border-white/10 rounded-xl shadow-lg p-6 transition-all">
                   <h2 className="text-lg font-semibold text-text-primary mb-2">💬 Forum Moderation</h2>
                   <p className="text-sm text-text-secondary mb-3">
                     Handle student Q&A and review reported posts.
@@ -165,11 +144,8 @@ function AdminDashboard() {
                   </button>
                 </motion.div>
 
-                {/* 4. HOVER ANIMATION ADDED */}
-                <motion.div
-                  whileHover={{ scale: 1.03 }} // <-- HOVER POP
-                  className="bg-secondary border border-white/10 rounded-xl shadow-lg p-6 transition-all"
-                >
+                {/* REPORTS */}
+                <motion.div whileHover={{ scale: 1.03 }} className="bg-secondary border border-white/10 rounded-xl shadow-lg p-6 transition-all">
                   <h2 className="text-lg font-semibold text-text-primary mb-2">🚨 Reports & Flags</h2>
                   <p className="text-sm text-text-secondary mb-3">
                     View and resolve reported content (videos, comments, forums).
@@ -181,13 +157,12 @@ function AdminDashboard() {
                     Review Reports
                   </button>
                 </motion.div>
-
               </div>
             </ScrollAnimation>
           </motion.div>
 
-          {/* 3. SCROLL ANIMATION + STAGGER ITEM */}
-          <motion.div variants={itemVariants}> {/* <-- STAGGER ITEM */}
+          {/* CHARTS SECTION */}
+          <motion.div variants={itemVariants}>
             <ScrollAnimation>
               <div className="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <EnrollmentChart data={enrollments} />
@@ -195,7 +170,6 @@ function AdminDashboard() {
               </div>
             </ScrollAnimation>
           </motion.div>
-          
         </div>
       </motion.div>
     </>
