@@ -88,7 +88,7 @@ const Header = () => (
     {/* Top Red Bar */}
     <div className="bg-red-600 text-white text-sm py-2 px-4 flex justify-between items-center">
       <div>📞 9490006663</div>
-      <div>📧 directorvrrcollege@gmail.com</div>
+      <div>📧 vrrdckallur@gmail.com</div>
     </div>
 
     {/* Main Header */}
@@ -96,7 +96,7 @@ const Header = () => (
       <div className="flex justify-between items-center max-w-7xl mx-auto py-3 px-6">
         <div className="flex items-center gap-3">
           <img
-            src="https://res.cloudinary.com/duhki4wze/image/upload/v1740047548/j7ustpcoxthwres98ftt.png"
+            src="https://res.cloudinary.com/duhki4wze/image/upload/v1762940849/vrr_college_logo_wn5qmq.png"
             alt="VRR Logo"
             className="w-12 h-12"
           />
@@ -160,7 +160,7 @@ const HeroSection = ({ navigate }) => {
       {/* Content */}
       <div className="relative z-10 text-white px-4">
         <img
-          src="https://res.cloudinary.com/duhki4wze/image/upload/v1740047548/j7ustpcoxthwres98ftt.png"
+          src="https://res.cloudinary.com/duhki4wze/image/upload/v1762940849/vrr_college_logo_wn5qmq.png"
           alt="VRR College Logo"
           className="mx-auto w-24 h-24 mb-4 rounded-full bg-white/80 p-2"
         />
